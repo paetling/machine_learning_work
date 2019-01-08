@@ -85,8 +85,10 @@ class Reinforce:
                                                                             self.discounted_episode_rewards: discounted_rewards
                                                                             })
 
+            print('Training Batch: ', batch_index)
             print('Loss: ', loss)
             print('Average Number of Steps: ', sum(batch_steps)/len(batch_steps))
+            print('\n')
 
 
 
