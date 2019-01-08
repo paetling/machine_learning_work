@@ -42,9 +42,9 @@ class Reinforce:
         print('shapes')
         print(stacked_discounted_episode_rewards.shape)
         print(self.softmax.shape)
-        elementwise_product = tf.math.multiply(tf.math.log(self.softmax), stacked_discounted_episode_rewards)
+        self.element_wise_product = tf.math.multiply(tf.math.log(self.softmax), stacked_discounted_episode_rewards)
 
-        self.loss = -tf.reduce_mean(elementwise_product, axis=0)
+        self.loss = -tf.reduce_mean(self.element_wise_product, axis=0)
 
         self.train = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
@@ -80,12 +80,14 @@ class Reinforce:
                     current_reward = current_reward * self.discount_factor + reward
                     discounted_rewards.append(current_reward)
 
-            loss,train = self.session.run([self.loss, self.train], feed_dict={
+            rewards, element_wise_product,loss,train = self.session.run([self.discounted_episode_rewards, self.element_wise_product,self.loss, self.train], feed_dict={
                                                                             self.input:states,
                                                                             self.discounted_episode_rewards: discounted_rewards
                                                                             })
 
             print('Training Batch: ', batch_index)
+#            print('Element Wise Product: ', element_wise_product)
+            print('Discounted Rewards: ', rewards)
             print('Loss: ', loss)
             print('Average Number of Steps: ', sum(batch_steps)/len(batch_steps))
             print('\n')
