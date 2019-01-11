@@ -3,7 +3,7 @@ import gym
 class CartPole:
     def __init__(self, should_render):
         self.should_render = should_render
-        self.env = gym.make('CartPole-v0')
+        self.env = gym.make('CartPole-v1')
 
     def get_number_of_actions(self):
         return self.env.action_space.n
