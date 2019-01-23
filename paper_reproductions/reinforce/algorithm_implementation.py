@@ -62,12 +62,18 @@ class Reinforce:
             discounted_rewards[t] = total_rewards
         return discounted_rewards
 
-    def train_model(self, number_of_batches, batch_size, max_steps):
+    def _load_saved_model(self):
         try:
             self.saver.restore(self.session, self.save_location)
             print('successfully loaded old model data')
         except:
             print('do not currently have data stored for this model')
+
+    def _save_model(self):
+        self.saver.save(self.session, self.save_location)
+
+    def train_model(self, number_of_batches, batch_size, max_steps):
+        self._load_saved_model()
 
         for batch_index in range(number_of_batches):
 
@@ -107,17 +113,25 @@ class Reinforce:
                                                                             self.discounted_episode_rewards: discounted_rewards})
 
             if ((batch_index + 1) % 10) == 0:
-                self.saver.save(self.session, self.save_location)
+                self._save_model()
                 print('Training Batch: ', batch_index)
                 print('Loss: ', loss)
                 print('Average Number of Steps: ', sum(batch_steps)/len(batch_steps))
                 print('\n')
 
 
-        self.saver.save(self.session, self.save_location)
+        self._save_model()
 
 
+    def run_model(self, number_of_episodes):
+        self._load_saved_model()
 
+        for episode_index in range(number_of_episodes):
 
+            state = self.environment.reset()
+            done = False
+            while not done:
+                (actions_to_take,) = self.session.run([self.actions_to_take], feed_dict={self.input:[state]})
+                action = actions_to_take[0]
 
-
+                state, _, done = self.environment.step(action)
