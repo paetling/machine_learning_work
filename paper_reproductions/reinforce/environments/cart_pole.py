@@ -3,7 +3,13 @@ import gym
 class CartPole:
     def __init__(self, should_render):
         self.should_render = should_render
-        self.env = gym.make('CartPole-v0')
+        gym.envs.registration.register(
+            id='CartPole-v2',
+            entry_point='gym.envs.classic_control:CartPoleEnv',
+            tags={'wrapper_config.TimeLimit.max_episode_steps': 5000},
+                reward_threshold=4750.0,
+        )
+        self.env = gym.make('CartPole-v2')
 
     def get_number_of_actions(self):
         return self.env.action_space.n
