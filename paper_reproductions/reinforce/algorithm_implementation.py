@@ -69,12 +69,13 @@ class Reinforce:
                 for i in range(max_steps):
                     (actions_to_take,) = self.session.run([self.actions_to_take], feed_dict={self.input:[state]})
                     action = actions_to_take[0]
-                    state, reward, done = self.environment.step(action)
+                    new_state, reward, done = self.environment.step(action)
 
                     batch_rewards[-1].append(reward)
                     batch_steps[-1] += 1
                     batch_states[-1].append(state)
                     batch_actions_taken[-1].append(action)
+                    state = new_state
 
                     if done:
                         break
