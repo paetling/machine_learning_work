@@ -1,6 +1,7 @@
 from collections import namedtuple
 
 import tensorflow as tf
+import gym
 
 DenseLayer = namedtuple('DenseLayer', ['units', 'activation'])
 def create_dense_neural_net(input_tensor, dense_layers):
@@ -27,7 +28,10 @@ class GenericOpenAIGymEnv:
         self.env = self._create_gym_env()
 
     def get_number_of_actions(self):
-        return self.env.action_space.n
+        if isinstance(self.env.action_space, gym.spaces.Box):
+            return self.env.action_space.shape[0]
+        else:
+            return self.env.action_space.n
 
     def get_random_action(self):
         return self.env.action_space.sample

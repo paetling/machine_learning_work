@@ -1,8 +1,8 @@
-from .reinforce.algorithm_implementation import Reinforce
-from .reinforce.environments.cart_pole import CartPole
+from .reinforce.continuous_action_algorithm_implementation import Reinforce
+from .reinforce.environments.pendulum import Pendulum
 
-cart_pole = CartPole(True)
-reinforce = Reinforce(cart_pole, './.saved_data/reinforce/cart_pole')
+pendulum = Pendulum(True)
+reinforce = Reinforce(pendulum, './.saved_data/reinforce/pendulum')
 
-#reinforce.train_model(1000, 5, 5000)
-reinforce.run_model(1)
+reinforce.train_model(1000, 5, 5000)
+#reinforce.run_model(1)
