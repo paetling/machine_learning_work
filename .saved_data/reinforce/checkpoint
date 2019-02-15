@@ -1,2 +1,2 @@
-model_checkpoint_path: "pendulum"
-all_model_checkpoint_paths: "pendulum"
+model_checkpoint_path: "half_cheetah"
+all_model_checkpoint_paths: "half_cheetah"

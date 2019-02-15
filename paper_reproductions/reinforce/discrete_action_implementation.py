@@ -3,7 +3,6 @@ import tensorflow as tf
 from ..library import DenseLayer, create_dense_neural_net
 
 class Reinforce:
-    # environment should have a way to get the state, rewards and say if you are done or not
     def __init__(self, environment, save_location):
         self.environment = environment
         self.save_location = save_location

@@ -1,5 +1,6 @@
 import gym
-from ...library import GenericOpenAIGymEnv
+from .. import GenericOpenAIGymEnv
+
 
 class CartPole(GenericOpenAIGymEnv):
     def __init__(self, should_render):
@@ -10,7 +11,6 @@ class CartPole(GenericOpenAIGymEnv):
             id='CartPole-v2',
             entry_point='gym.envs.classic_control:CartPoleEnv',
             tags={'wrapper_config.TimeLimit.max_episode_steps': 5000},
-                reward_threshold=4750.0,
+            reward_threshold=4750.0,
         )
         return gym.make('CartPole-v2')
-

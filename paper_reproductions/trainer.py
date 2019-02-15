@@ -1,8 +1,10 @@
-from .reinforce.continuous_action_algorithm_implementation import Reinforce
-from .reinforce.environments.pendulum import Pendulum
+from .dqn.implementation import DQN
+from .library.environments.breakout_ram import BreakoutRam
 
-pendulum = Pendulum(True)
-reinforce = Reinforce(pendulum, './.saved_data/reinforce/pendulum')
+environment = BreakoutRam(True)
 
-reinforce.train_model(1000, 5, 5000)
+training_sessions = 20000
+reinforce = DQN(environment, './.saved_data/dqn/breakout_ram', 10000, training_sessions)
+
+reinforce.train_model(training_sessions, 10000, 32)
 #reinforce.run_model(1)
