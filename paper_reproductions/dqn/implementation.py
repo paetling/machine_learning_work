@@ -17,12 +17,14 @@ class DQN:
         self.input = tf.placeholder(tf.float32, shape=[None, *self.state_size])
         self.actions_taken = tf.placeholder(tf.int32, shape=[None])
         self.y_values = tf.placeholder(tf.float32, shape=[None])
+        # self.rewards = tf.placeholder(tf.float32, shape=[None])
+        # self.dones = tf.placeholder(tf.float32, shape=[None])
 
         self.learning_rate = .001
-        self.discount_factor = 0.99
+        self.discount_factor = 0.9999
 
         self.max_epsilon = 1.
-        self.min_epsilon = .1
+        self.min_epsilon = .2
         self.frames_to_change_epsilon = frames_to_change_epsilon
 
         self.frequency_to_copy_into_target = 50
@@ -40,9 +42,9 @@ class DQN:
         return random.randint(0, self.action_size - 1)
 
     def _create_learning_network(self):
-        def get_neural_net(name):
+        def get_neural_net(name, input_tensor):
             return create_dense_neural_net(
-                self.input,
+                input_tensor,
                 [
                     DenseLayer(100, activation=tf.keras.activations.tanh),
                     DenseLayer(50, activation=tf.keras.activations.tanh),
@@ -52,8 +54,8 @@ class DQN:
                 name,
             )
 
-        self.training_nn = get_neural_net('DQNetwork')
-        self.target_nn = get_neural_net('TargetDQNetwork')
+        self.training_nn = get_neural_net('DQNetwork', self.input)
+        self.target_nn = get_neural_net('TargetDQNetwork', self.input)
 
         self.action_to_take = tf.argmax(self.training_nn, axis=1)
         self.max_target_value = tf.reduce_max(self.target_nn, axis=1)
@@ -101,25 +103,26 @@ class DQN:
         target_copy_index = 0
         session_lengths = []
         loss = None
+        rewards = []
         for session_index in range(number_of_sessions_to_run):
 
             state = self.environment.reset()
+            session_reward = 0
             for step_index in range(max_steps):
-                action_to_take = None
-                target_nn_action_values = None
 
                 # Determines whether to take a random action or not
                 epsilon_test_random = random.random()
-                if epsilon_test_random < current_epsilon:
-                    state_actions, target_actions, action_to_take = self.session.run(
-                        [self.training_nn, self.target_nn, self.action_to_take],
+                if epsilon_test_random > current_epsilon:
+                    (actions_to_take, ) = self.session.run(
+                        [self.action_to_take],
                         feed_dict={self.input: [state]})
-                    action_to_take = action_to_take[0]
+                    action_to_take = actions_to_take[0]
                 else:
                     action_to_take = self._get_random_action()
 
                 new_state, reward, done = self.environment.step(action_to_take)
 
+                session_reward = session_reward + (self.discount_factor**step_index) * reward
                 replay_buffer_object = (state, action_to_take, reward, new_state, done)
 
                 if (len(replay_buffer) < self.max_items_in_replay_buffer):
@@ -163,7 +166,8 @@ class DQN:
                 state = new_state
 
                 if done:
-                    session_lengths.append(step_index)
+                    session_lengths.append(step_index + 1)
+                    rewards.append(session_reward)
                     break
 
             if target_copy_index == self.frequency_to_copy_into_target:
@@ -178,11 +182,12 @@ class DQN:
 
             if session_index % 50 == 0:
                 self._save_model()
-                print('Session: {} Current Epsilon: {} Avg Length: {} Longest Length: {} Last Loss: {}'.format(
+                print('Session: {} Current Epsilon: {} Avg Length: {} Longest Length: {} Max Reward: {} Last Loss: {}'.format(
                     session_index,
                     current_epsilon,
                     np.average(session_lengths[-50:]),
                     np.max(session_lengths[-50:]),
+                    np.max(rewards[-50:]),
                     loss))
         self._save_model()
 

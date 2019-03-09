@@ -46,7 +46,7 @@ class GenericOpenAIGymEnv:
             return self.env.action_space.n
 
     def get_random_action(self):
-        return self.env.action_space.sample
+        return self.env.action_space.sample()
 
     def get_state_shape(self):
         return self.env.observation_space.shape
