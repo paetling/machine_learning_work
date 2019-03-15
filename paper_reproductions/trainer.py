@@ -1,10 +1,9 @@
-from .dqn.implementation import DQN
-from .library.environments.breakout_ram import BreakoutRam
+from .advantage_actor_critic.discrete_action_implementation import A2C
+from .library.environments.cart_pole import CartPole
 
-environment = BreakoutRam(True)
+environment = CartPole(False)
 
-training_sessions = 5000
-reinforce = DQN(environment, './.saved_data/dqn/breakout_ram', 10000, training_sessions)
+reinforce = A2C(environment, './.saved_data/a2c/cart_pole')
 
-# reinforce.train_model(training_sessions + 2000, 10000, 32)
-reinforce.run_model(1)
+reinforce.train_model(100000, 5000)
+# reinforce.run_model(1)
